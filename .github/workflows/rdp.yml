@@ -20,14 +20,17 @@ jobs:
           Add-LocalGroupMember -Group "Administrators" -Member "CloudUser"
 
       - name: Start Cloudflare Tunnel
-        shell: cmd # أضفنا هذا السطر لإصلاح المشكلة
         run: |
-          curl -L --output cloudflared.exe https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe
-          start /B cloudflared.exe tunnel --no-autoupdate run --token ${{ secrets.CF_TOKEN }}
+          # تحميل البرنامج
+          Invoke-WebRequest -Uri "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe" -OutFile "cloudflared.exe"
+          
+          # تشغيل النفق في الخلفية باستخدام PowerShell
+          Start-Process -FilePath ".\cloudflared.exe" -ArgumentList "tunnel", "--no-autoupdate", "run", "--token", "${{ secrets.CF_TOKEN }}" -WindowStyle Hidden
+          
+          # الانتظار 20 ثانية للتأكد من الاتصال قبل الانتقال للخطوة التالية
+          Start-Sleep -Seconds 20
 
       - name: Keep Alive
         run: |
-          Write-Host "الآن النفق شغال والدومين الخاص بك مرتبط بالجهاز."
-          Write-Host "User: CloudUser"
-          Write-Host "Pass: Password123!"
+          Write-Host "الآن النفق شغال.. تأكد من حالة الدومين في لوحة تحكم كلاود فلير."
           Start-Sleep -Seconds 21600
