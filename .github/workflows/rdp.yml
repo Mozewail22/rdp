@@ -20,9 +20,10 @@ jobs:
           Add-LocalGroupMember -Group "Administrators" -Member "CloudUser"
 
       - name: Start Cloudflare Tunnel
+        shell: cmd # أضفنا هذا السطر لإصلاح المشكلة
         run: |
           curl -L --output cloudflared.exe https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe
-          start /B .\cloudflared.exe tunnel --no-autoupdate run --token ${{ secrets.CF_TOKEN }}
+          start /B cloudflared.exe tunnel --no-autoupdate run --token ${{ secrets.CF_TOKEN }}
 
       - name: Keep Alive
         run: |
